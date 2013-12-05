@@ -710,31 +710,36 @@ static void status_icon_update(gboolean mute, gboolean ignore_cache)
 			gtk_status_icon_set_from_pixbuf(m_status_icon, m_icons[icon_number-1]);
 		}
 
+		icon_cache = icon_number;
+	}
+
+	if(volume != volume_cache || ignore_cache)
+	{
+		gchar buffer[32];
+		g_sprintf(
+			buffer,
+			"%s: %d%%",
+			backend_get_channel() ? backend_get_channel() : "Volume",
+			volume
+		);
 		#ifdef COMPILEWITH_NOTIFY
 		if (m_notification != NULL)
 		{
 			if(icon_number == 1)
-			  notify_notification_update(m_notification, APPNAME, NULL,
+			  notify_notification_update(m_notification, APPNAME, buffer,
 			    "audio-volume-muted");
 			else if(icon_number <= 3)
-			  notify_notification_update(m_notification, APPNAME, NULL,
+			  notify_notification_update(m_notification, APPNAME, buffer,
 			    "audio-volume-low");
 			else if(icon_number <= 6)
-			  notify_notification_update(m_notification, APPNAME, NULL,
+			  notify_notification_update(m_notification, APPNAME, buffer,
 			    "audio-volume-medium");
 			else
-			  notify_notification_update(m_notification, APPNAME, NULL,
+			  notify_notification_update(m_notification, APPNAME, buffer,
 			    "audio-volume-high");
 		}
 		#endif
 
-		icon_cache = icon_number;
-	}
-
-	if((volume != volume_cache || ignore_cache) && backend_get_channel())
-	{
-		gchar buffer[32];
-		g_sprintf(buffer, "%s: %d%%", backend_get_channel(), volume);
 		gtk_status_icon_set_tooltip_text(m_status_icon, buffer);
 
 		#ifdef COMPILEWITH_NOTIFY
